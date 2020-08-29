@@ -1,34 +1,42 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BaseEntity, OneToMany } from 'typeorm'
-import {Snippet} from './Snippet'
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BaseEntity, OneToMany } from "typeorm";
+import { Snippet } from "./Snippet";
 
 @Entity()
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id!: number
+  constructor(username: string, password: string, description: string, email: string, uniqueid: string) {
+    super();
+    this.username = username;
+    this.password = password;
+    this.description = description;
+    this.email = email;
+    this.uniqueid = uniqueid;
+  }
 
-  @Column({unique: true})
+  @PrimaryGeneratedColumn()
+  id!: number;
+
+  @Column({ unique: true })
   username!: string;
 
-  @Column({unique: true})
+  @Column({ unique: true })
   uniqueid!: string;
 
   @Column()
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 
-  @Column({unique: true})
+  @Column({ unique: true })
   email!: string;
 
   @Column()
   description: string;
 
-
   @Column()
-  password: string
+  password: string;
 
-  @OneToMany(() => Snippet, snippet => snippet.creator)
-  snippets: Snippet[]
+  @OneToMany(() => Snippet, (snippet) => snippet.creator)
+  snippets: Snippet[];
 }

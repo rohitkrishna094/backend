@@ -27,4 +27,7 @@ export class Snippet extends BaseEntity {
 
   @Column()
   creatorId: string;
+
+  @Column()
+  code: string;
 }
