@@ -1,16 +1,22 @@
-// Redis and Session
+import 'reflect-metadata';
 import connectRedis from 'connect-redis';
 import 'dotenv-safe/config';
 import express from 'express';
 import session from 'express-session';
 import Redis from 'ioredis';
-// morgan
+
 import morgan from 'morgan';
 import path from 'path';
-import 'reflect-metadata';
+import passport from 'passport';
 import { createConnection } from 'typeorm';
+import { isAuthenticated } from './middleware/auth';
+import { serverError } from './middleware/errors';
+import { GITHUB } from './config/OAuthConfig';
+import passportMiddleware from './middleware/passportMiddleWare';
+
 // Constants
 import { COOKIE_NAME, __prod__ } from './constants';
+
 // Entities
 import Snippet from './entities/Snippet';
 import User from './entities/User';
@@ -61,6 +67,30 @@ const main = async () => {
 
   app.use(express.json());
 
+  // passport middleware
+  app.use(passportMiddleware.initialize());
+  app.use(passportMiddleware.session());
+  app.get('/auth/github', passport.authenticate('github'));
+  app.get(GITHUB.callbackURL, passport.authenticate('github'), (req, res) => {
+    res.redirect('/profile');
+  });
+
+  app.get('/profile', isAuthenticated, (req, res) => {
+    res.json({ message: 'Welcome to your profile page', status: 200 });
+  });
+
+  app.get('/auth/logout', (req, res) => {
+    // passportjs must have set uid etc, hence we need to perform a logout on request object
+    req.logout();
+    // we also need to clear the cookie
+    res.clearCookie(COOKIE_NAME);
+    // we need to destroy express-session which would delete the corresponding redis session as well
+    req.session.destroy((err) => {
+      console.error(err);
+      res.redirect('/profile');
+    });
+  });
+
   app.use('/api/snippets', snippets);
   app.use('/api/user', user);
   app.use('/api/login', login);
@@ -81,8 +111,10 @@ const main = async () => {
     res.status(404).json({ status: '404' });
   });
 
-  app.listen(parseInt(process.env.PORT, 10), () => {
-    // tslint:disable-next-line:no-console
+  app.use(serverError);
+
+  // +str is shortform to convert a string to number
+  app.listen(+process.env.PORT, () => {
     console.log(`Server started on localhost:${process.env.PORT}`);
   });
 };

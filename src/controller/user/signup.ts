@@ -11,8 +11,6 @@ router.post('/', async (req: express.Request, res: express.Response) => {
   const { password } = body;
   const desc = body.description;
   const { email } = body;
-  // eslint-disable-next-line no-unused-vars
-  const { unique } = body;
 
   if (password.length <= 2) {
     res.send('Password too short');

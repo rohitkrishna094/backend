@@ -1,7 +1,6 @@
 import * as express from 'express';
 import argon2 from 'argon2';
 import User from '../../entities/User';
-import Snippet from '../../entities/Snippet';
 
 const router = express.Router();
 
@@ -31,8 +30,6 @@ router.get('/id', async (req: express.Request, res: express.Response) => {
   const { body } = req;
   const id = body.uuid;
   const user = await User.findOne(id);
-  // eslint-disable-next-line no-unused-vars
-  const snippets = await Snippet.find({ user: id, private: false });
 
   if (!user) {
     res.send('user not found');
