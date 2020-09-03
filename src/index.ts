@@ -11,7 +11,7 @@ import passport from 'passport';
 import { createConnection } from 'typeorm';
 import { isAuthenticated } from './middleware/auth';
 import { serverError } from './middleware/errors';
-import { GITHUB } from './config/OAuthConfig';
+import { GITHUB, GOOGLE } from './config/OAuthConfig';
 import passportMiddleware from './middleware/passportMiddleWare';
 
 // Constants
@@ -70,10 +70,28 @@ const main = async () => {
   // passport middleware
   app.use(passportMiddleware.initialize());
   app.use(passportMiddleware.session());
+
+  // TODO oauth routes refactor this to another folder
   app.get('/auth/github', passport.authenticate('github'));
   app.get(GITHUB.callbackURL, passport.authenticate('github'), (req, res) => {
     res.redirect('/profile');
   });
+
+  app.get(
+    '/auth/google',
+    passport.authenticate('google', {
+      scope: ['profile', 'https://www.googleapis.com/auth/userinfo.email']
+    })
+  );
+
+  app.get(
+    GOOGLE.callbackURL,
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    (req, res) => {
+      // Successful authentication, redirect home.
+      res.redirect('/profile');
+    }
+  );
 
   app.get('/profile', isAuthenticated, (req, res) => {
     res.json({ message: 'Welcome to your profile page', status: 200 });
