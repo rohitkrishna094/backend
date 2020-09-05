@@ -19,8 +19,7 @@ router.get(
     const user: any = req.user;
     const token = generateToken({ id: user.uuid }, { expiresIn: 24 * 60 * 60 });
     // redirect from here to hide the callback code, recheck logic or research more
-    // return res.redirect(`/oauthRedirect?token=${token}`);
-    return res.json({ token, token_type: 'Bearer', expires_in: 24 * 60 * 60 });
+    return res.redirect(`/oauthRedirect?token=${token}`);
   }
 );
 
@@ -36,8 +35,7 @@ router.get(
     // eslint-disable-next-line prefer-destructuring
     const user: any = req.user;
     const token = generateToken({ id: user.uuid }, { expiresIn: 24 * 60 * 60 });
-    // return res.redirect(`/oauthRedirect?token=${token}`);
-    return res.json({ token, token_type: 'Bearer', expires_in: 24 * 60 * 60 });
+    return res.redirect(`/oauthRedirect?token=${token}`);
   }
 );
 
