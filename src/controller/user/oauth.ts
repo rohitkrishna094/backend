@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import passport from 'passport';
-import { GITHUB, GOOGLE } from '../../config/oauthConfig';
 import { generateToken } from '../../utils/jwtUtils';
 
 const router = express.Router();
@@ -13,7 +12,7 @@ router.get('/oauthRedirect', (req: Request, res: Response) => {
 router.get('/auth/github', passport.authenticate('github'));
 
 router.get(
-  GITHUB.callbackURL,
+  '/auth/github/callback',
   passport.authenticate('github', { session: false }),
   (req: Request, res: Response) => {
     // eslint-disable-next-line prefer-destructuring
@@ -28,7 +27,7 @@ router.get(
 router.get('/auth/google', passport.authenticate('google', { session: false }));
 
 router.get(
-  GOOGLE.callbackURL,
+  '/auth/google/callback',
   passport.authenticate('google', {
     session: false,
     failureRedirect: '/login'
